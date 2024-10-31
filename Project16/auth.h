@@ -1,4 +1,4 @@
-#ifndef AUTH_H
+﻿#ifndef AUTH_H
 #define AUTH_H
 
 #include "crow_all.h"

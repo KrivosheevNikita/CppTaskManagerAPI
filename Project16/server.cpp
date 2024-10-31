@@ -1,4 +1,4 @@
-#include "auth.h"
+п»ї#include "auth.h"
 #include "task.h"
 #include "tag.h"
 
@@ -6,51 +6,51 @@ int main()
 {
     crow::SimpleApp app; 
 
-    // Регистрация
+    // Р РµРіРёСЃС‚СЂР°С†РёСЏ
     CROW_ROUTE(app, "/register").methods("POST"_method)([](const crow::request& req) 
     {
         return auth::registerUser(req); 
     });
 
-    // Авторизация
+    // РђРІС‚РѕСЂРёР·Р°С†РёСЏ
     CROW_ROUTE(app, "/login").methods("POST"_method)([](const crow::request& req) 
     {
         return auth::login(req); 
     });
 
-    // Создание новой задачи
+    // РЎРѕР·РґР°РЅРёРµ РЅРѕРІРѕР№ Р·Р°РґР°С‡Рё
     CROW_ROUTE(app, "/task").methods("POST"_method)([](const crow::request& req)
     {
         return task::createTask(req);
     });
 
 
-    // Обновление задачи
+    // РћР±РЅРѕРІР»РµРЅРёРµ Р·Р°РґР°С‡Рё
     CROW_ROUTE(app, "/task/<int>").methods("PUT"_method)([](const crow::request& req, int task_id)
     {
         return task::updateTask(req, task_id);
     });
 
-    // Удаление задачи по task_id
+    // РЈРґР°Р»РµРЅРёРµ Р·Р°РґР°С‡Рё РїРѕ task_id
     CROW_ROUTE(app, "/task/<int>").methods("DELETE"_method)([](const crow::request& req, int task_id)
         {
             return task::deleteTask(req, task_id);
         });
 
-    // Получение задачи по id 
+    // РџРѕР»СѓС‡РµРЅРёРµ Р·Р°РґР°С‡Рё РїРѕ id 
     CROW_ROUTE(app, "/task/<int>").methods("GET"_method)([](const crow::request& req, int task_id)
     {
         return task::getTask(req, task_id);
     });
 
 
-    // Получение списка всех задач пользователя
+    // РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° РІСЃРµС… Р·Р°РґР°С‡ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
     CROW_ROUTE(app, "/tasks").methods("GET"_method)([](const crow::request& req)
     {
             return task::getAllTasks(req);
     });
 
-    // Добавление тегов к задаче
+    // Р”РѕР±Р°РІР»РµРЅРёРµ С‚РµРіРѕРІ Рє Р·Р°РґР°С‡Рµ
     CROW_ROUTE(app, "/task/<int>/tags").methods("POST"_method)([](const crow::request& req, int task_id)
     {
         return tag::addTags(req, task_id);

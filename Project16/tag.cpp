@@ -1,4 +1,4 @@
-#include "tag.h"
+п»ї#include "tag.h"
 
 namespace tag 
 {
@@ -9,12 +9,12 @@ namespace tag
             for (const auto& tag : jsonData["tags"])
             {
                 std::string tag_name = tag.s();
-                // Проверяем, существует ли тег, если нет, то добавляем его
+                // РџСЂРѕРІРµСЂСЏРµРј, СЃСѓС‰РµСЃС‚РІСѓРµС‚ Р»Рё С‚РµРі, РµСЃР»Рё РЅРµС‚, С‚Рѕ РґРѕР±Р°РІР»СЏРµРј РµРіРѕ
                 auto tagCheck = txn.exec_params("SELECT tag_id FROM tags WHERE tag_name = $1", tag_name);
 
                 int tag_id;
                 if (tagCheck.empty()) {
-                    // Если тег не существует, то создаем новый
+                    // Р•СЃР»Рё С‚РµРі РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚, С‚Рѕ СЃРѕР·РґР°РµРј РЅРѕРІС‹Р№
                     auto insertTag = txn.exec_params(
                         "INSERT INTO tags (tag_name) VALUES ($1) RETURNING tag_id", tag_name
                     );
@@ -25,7 +25,7 @@ namespace tag
                     tag_id = tagCheck[0][0].as<int>();
                 }
 
-                // Привязываем тег к задаче
+                // РџСЂРёРІСЏР·С‹РІР°РµРј С‚РµРі Рє Р·Р°РґР°С‡Рµ
                 txn.exec_params("INSERT INTO task_tags (task_id, tag_id) VALUES ($1, $2) ON CONFLICT DO NOTHING", task_id, tag_id);
             }
         }
@@ -74,7 +74,7 @@ namespace tag
 
             pqxx::work txn(db);
 
-            // Проверка, существует ли задача с task_id и принадлежит ли она пользователю
+            // РџСЂРѕРІРµСЂРєР°, СЃСѓС‰РµСЃС‚РІСѓРµС‚ Р»Рё Р·Р°РґР°С‡Р° СЃ task_id Рё РїСЂРёРЅР°РґР»РµР¶РёС‚ Р»Рё РѕРЅР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЋ
             auto taskCheck = txn.exec_params(
                 "SELECT task_id FROM tasks WHERE task_id = $1 AND user_id = $2", task_id, user_id
             );
@@ -82,7 +82,7 @@ namespace tag
             if (taskCheck.empty())
                 return crow::response(403, "Access denied");
 
-            // Добавляем теги к задаче
+            // Р”РѕР±Р°РІР»СЏРµРј С‚РµРіРё Рє Р·Р°РґР°С‡Рµ
             tag::addTagsToTask(txn, task_id, jsonData);
 
             txn.commit();

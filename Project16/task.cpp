@@ -1,4 +1,4 @@
-#include "task.h"
+п»ї#include "task.h"
 
 namespace task
 {
@@ -8,7 +8,7 @@ namespace task
         try
         {
             int user_id;
-            // Проверяем токен и получаем user_id
+            // РџСЂРѕРІРµСЂСЏРµРј С‚РѕРєРµРЅ Рё РїРѕР»СѓС‡Р°РµРј user_id
             if (!auth::checkToken(req, user_id)) {
                 return crow::response(401, "Missing or invalid authorization token");
             }
@@ -23,8 +23,8 @@ namespace task
 
             std::string task_name = jsonData["task_name"].s();
             std::string description = jsonData["description"].s();
-            int status_id = jsonData.has("status_id") ? jsonData["status_id"].i() : 1; // Значение по умолчанию 1
-            int priority = jsonData.has("priority") ? jsonData["priority"].i() : 1; // Значение по умолчанию 1
+            int status_id = jsonData.has("status_id") ? jsonData["status_id"].i() : 1; // Р—РЅР°С‡РµРЅРёРµ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ 1
+            int priority = jsonData.has("priority") ? jsonData["priority"].i() : 1; // Р—РЅР°С‡РµРЅРёРµ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ 1
             std::string due_date = jsonData.has("due_date") ? jsonData["due_date"].s() : std::string("2099-12-31");
 
             pqxx::work txn(db);
@@ -37,7 +37,7 @@ namespace task
 
             int task_id = taskInsert[0][0].as<int>();
 
-            // Проверяем наличие тегов и добавляем их, если они есть
+            // РџСЂРѕРІРµСЂСЏРµРј РЅР°Р»РёС‡РёРµ С‚РµРіРѕРІ Рё РґРѕР±Р°РІР»СЏРµРј РёС…, РµСЃР»Рё РѕРЅРё РµСЃС‚СЊ
             tag::addTagsToTask(txn, task_id, jsonData);
 
             txn.commit();
@@ -81,13 +81,13 @@ namespace task
             if (result.empty())
                 return crow::response(403, "Access denied");
 
-            // Обновление всех полей задачи
+            // РћР±РЅРѕРІР»РµРЅРёРµ РІСЃРµС… РїРѕР»РµР№ Р·Р°РґР°С‡Рё
             txn.exec_params("UPDATE tasks SET task_name = $1, description = $2, status_id = $3, priority = $4, due_date = $5 WHERE task_id = $6",
                 task_name, description, status_id, priority, due_date, task_id);
 
             txn.exec_params("DELETE FROM task_tags WHERE task_id = $1", task_id);
 
-            // Обновление тегов
+            // РћР±РЅРѕРІР»РµРЅРёРµ С‚РµРіРѕРІ
             tag::addTagsToTask(txn, task_id, jsonData);
 
             txn.commit();

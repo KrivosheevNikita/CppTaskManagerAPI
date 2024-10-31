@@ -1,4 +1,4 @@
-#include "auth.h"
+п»ї#include "auth.h"
 
 pqxx::connection connectDB()
 {
@@ -8,7 +8,7 @@ pqxx::connection connectDB()
 
 namespace auth
 {
-    // Проверка токена и помещение id пользователя в переменную user_id
+    // РџСЂРѕРІРµСЂРєР° С‚РѕРєРµРЅР° Рё РїРѕРјРµС‰РµРЅРёРµ id РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РІ РїРµСЂРµРјРµРЅРЅСѓСЋ user_id
     bool checkToken(const crow::request& req, int& user_id)
     {
         try
@@ -17,7 +17,7 @@ namespace auth
             if (token.empty() || !token.starts_with("Bearer "))
                 return false;
 
-            token = token.substr(7); // Удаление "Bearer " из токена
+            token = token.substr(7); // РЈРґР°Р»РµРЅРёРµ "Bearer " РёР· С‚РѕРєРµРЅР°
             auto decoded = jwt::decode(token);
             auto verifier = jwt::verify()
                 .allow_algorithm(jwt::algorithm::hs256{ "key" })
@@ -44,7 +44,7 @@ namespace auth
         catch (const std::exception& e) {}
     }
 
-    // Генерация соли для хеширования
+    // Р“РµРЅРµСЂР°С†РёСЏ СЃРѕР»Рё РґР»СЏ С…РµС€РёСЂРѕРІР°РЅРёСЏ
     std::string generateSalt(unsigned int length = 10)
     {
         std::random_device r;
@@ -59,7 +59,7 @@ namespace auth
         return ss.str();
     }
 
-    // Хеширование пароля 
+    // РҐРµС€РёСЂРѕРІР°РЅРёРµ РїР°СЂРѕР»СЏ 
     std::string hashPassword(const std::string& password, std::string& salt)
     {
         if (salt.empty())
@@ -85,14 +85,14 @@ namespace auth
         return std::string(encoded);
     }
 
-    // Проверка пароля
+    // РџСЂРѕРІРµСЂРєР° РїР°СЂРѕР»СЏ
     bool verifyPassword(const std::string& password, std::string& salt, const std::string& hash)
     {
         std::string hashedPassword = hashPassword(password, salt);
         return hashedPassword == hash;
     }
 
-    // Проверка корректности данных пользователя и помещение id пользователя в переменную user_id
+    // РџСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РґР°РЅРЅС‹С… РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ Рё РїРѕРјРµС‰РµРЅРёРµ id РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РІ РїРµСЂРµРјРµРЅРЅСѓСЋ user_id
     bool checkUser(const std::string& username, const std::string& password, int& user_id)
     {
         auto db = connectDB();
@@ -113,7 +113,7 @@ namespace auth
         return true;
     }
 
-    // Генерация JWT токена
+    // Р“РµРЅРµСЂР°С†РёСЏ JWT С‚РѕРєРµРЅР°
     std::string generateToken(int user_id) {
         return jwt::create()
             .set_issuer("taskManager")
@@ -123,7 +123,7 @@ namespace auth
             .sign(jwt::algorithm::hs256{ "key" });
     }
 
-    // Авторизация, возврат токена 
+    // РђРІС‚РѕСЂРёР·Р°С†РёСЏ, РІРѕР·РІСЂР°С‚ С‚РѕРєРµРЅР° 
     crow::response login(const crow::request& req)
     {
         try
