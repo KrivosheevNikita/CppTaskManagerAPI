@@ -1,4 +1,4 @@
-#ifndef DATABASE_H
+﻿#ifndef DATABASE_H
 #define DATABASE_H
 
 #include <pqxx/pqxx>
@@ -28,6 +28,7 @@ private:
     std::vector<std::shared_ptr<pqxx::connection>> connections;
 };
 
+// Класс для автоматического возврата соединения в пул после выхода из зоны видимости
 class ConnectionGuard 
 {
 public:

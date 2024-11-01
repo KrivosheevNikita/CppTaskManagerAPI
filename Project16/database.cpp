@@ -1,4 +1,4 @@
-#include "database.h"
+п»ї#include "database.h"
 
 ConnectionPool::ConnectionPool(const std::string& connStr, unsigned int minSize, unsigned int maxSize)
     : connStr(connStr), minSize(minSize), maxSize(maxSize), curSize(0) 
@@ -10,14 +10,14 @@ ConnectionPool::ConnectionPool(const std::string& connStr, unsigned int minSize,
     }
 }
 
-// Создание единственного экземпляра пула соединений
+// РЎРѕР·РґР°РЅРёРµ РµРґРёРЅСЃС‚РІРµРЅРЅРѕРіРѕ СЌРєР·РµРјРїР»СЏСЂР° РїСѓР»Р° СЃРѕРµРґРёРЅРµРЅРёР№
 ConnectionPool& ConnectionPool::getInstance()
 {
     static ConnectionPool pool(CONNECTION_STRING, MIN_SIZE_POOL, MAX_SIZE_POOL);
     return pool;
 }
 
-// Взять соединение из пула
+// Р’Р·СЏС‚СЊ СЃРѕРµРґРёРЅРµРЅРёРµ РёР· РїСѓР»Р°
 std::shared_ptr<pqxx::connection> ConnectionPool::getConnection() 
 {
     std::unique_lock<std::mutex> lock(mtx);
@@ -33,35 +33,35 @@ std::shared_ptr<pqxx::connection> ConnectionPool::getConnection()
     auto conn = connections.back();
     connections.pop_back();
 
-    // Если соединение разорвано, то создаем новое соединение
+    // Р•СЃР»Рё СЃРѕРµРґРёРЅРµРЅРёРµ СЂР°Р·РѕСЂРІР°РЅРѕ, С‚Рѕ СЃРѕР·РґР°РµРј РЅРѕРІРѕРµ СЃРѕРµРґРёРЅРµРЅРёРµ
     if (!conn->is_open()) 
         conn = std::make_shared<pqxx::connection>(connStr);
 
     return conn;
 }
 
-// Вернуть соединение в пул 
+// Р’РµСЂРЅСѓС‚СЊ СЃРѕРµРґРёРЅРµРЅРёРµ РІ РїСѓР» 
 void ConnectionPool::returnConnection(std::shared_ptr<pqxx::connection> conn) 
 {
     std::unique_lock<std::mutex> lock(mtx);
 
-    // Возвращаем соединение, если оно активно
+    // Р’РѕР·РІСЂР°С‰Р°РµРј СЃРѕРµРґРёРЅРµРЅРёРµ, РµСЃР»Рё РѕРЅРѕ Р°РєС‚РёРІРЅРѕ
     if (conn->is_open())
         connections.push_back(conn);
-    // Иначе уменьшаем размер пула
+    // РРЅР°С‡Рµ СѓРјРµРЅСЊС€Р°РµРј СЂР°Р·РјРµСЂ РїСѓР»Р°
     else
         --curSize; 
 
     poolWaiting.notify_one();
 }
 
-// Количество доступных соединений
+// РљРѕР»РёС‡РµСЃС‚РІРѕ РґРѕСЃС‚СѓРїРЅС‹С… СЃРѕРµРґРёРЅРµРЅРёР№
 unsigned int ConnectionPool::availableConnections() const 
 {
     return connections.size();
 }
 
-// Количество активных соединений
+// РљРѕР»РёС‡РµСЃС‚РІРѕ Р°РєС‚РёРІРЅС‹С… СЃРѕРµРґРёРЅРµРЅРёР№
 unsigned int ConnectionPool::activeConnections() const 
 {
     return curSize - connections.size();
@@ -84,7 +84,7 @@ bool ConnectionGuard::is_open() const
     return conn && conn->is_open();
 }
 
-// Соединение с БД
+// РЎРѕРµРґРёРЅРµРЅРёРµ СЃ Р‘Р”
 ConnectionGuard connectDB()
 {
     return ConnectionGuard();
