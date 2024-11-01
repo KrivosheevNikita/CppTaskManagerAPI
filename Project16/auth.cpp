@@ -1,11 +1,5 @@
 ﻿#include "auth.h"
 
-pqxx::connection connectDB()
-{
-    const std::string connStr = "dbname=taskManager user=postgres password=1234 host=localhost port=5432";
-    return pqxx::connection(connStr);
-}
-
 namespace auth
 {
     // Проверка токена и помещение id пользователя в переменную user_id
@@ -53,7 +47,8 @@ namespace auth
         std::uniform_int_distribution<> dis(0, chars.size() - 1);
 
         std::stringstream ss;
-        for (int i = 0; i != length; ++i) {
+        for (int i = 0; i != length; ++i) 
+        {
             ss << chars[dis(gen)];
         }
         return ss.str();
@@ -114,7 +109,8 @@ namespace auth
     }
 
     // Генерация JWT токена
-    std::string generateToken(int user_id) {
+    std::string generateToken(int user_id) 
+    {
         return jwt::create()
             .set_issuer("taskManager")
             .set_type("JWT")

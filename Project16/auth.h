@@ -5,9 +5,7 @@
 #include <pqxx/pqxx>
 #include <jwt-cpp/jwt.h>
 #include "argon2.h"
-#include <string>
-
-pqxx::connection connectDB();
+#include "database.h"
 
 namespace auth 
 {

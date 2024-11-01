@@ -1,9 +1,11 @@
 ﻿#include "auth.h"
 #include "task.h"
 #include "tag.h"
-
+#include "database.h"
 int main() 
 {
+    ConnectionPool::getInstance(); // Создание пула соединений к БД
+
     crow::SimpleApp app; 
 
     // Регистрация
@@ -19,30 +21,28 @@ int main()
     });
 
     // Создание новой задачи
-    CROW_ROUTE(app, "/task").methods("POST"_method)([](const crow::request& req)
+    CROW_ROUTE(app, "/tasks").methods("POST"_method)([](const crow::request& req)
     {
         return task::createTask(req);
     });
 
+    // Получение задачи по id 
+    CROW_ROUTE(app, "/tasks/<int>").methods("GET"_method)([](const crow::request& req, int task_id)
+    {
+            return task::getTask(req, task_id);
+    });
 
-    // Обновление задачи
-    CROW_ROUTE(app, "/task/<int>").methods("PUT"_method)([](const crow::request& req, int task_id)
+    // Обновление задачи по id 
+    CROW_ROUTE(app, "/tasks/<int>").methods("PUT"_method)([](const crow::request& req, int task_id)
     {
         return task::updateTask(req, task_id);
     });
 
-    // Удаление задачи по task_id
-    CROW_ROUTE(app, "/task/<int>").methods("DELETE"_method)([](const crow::request& req, int task_id)
-        {
-            return task::deleteTask(req, task_id);
-        });
-
-    // Получение задачи по id 
-    CROW_ROUTE(app, "/task/<int>").methods("GET"_method)([](const crow::request& req, int task_id)
+    // Удаление задачи по id
+    CROW_ROUTE(app, "/tasks/<int>").methods("DELETE"_method)([](const crow::request& req, int task_id)
     {
-        return task::getTask(req, task_id);
+            return task::deleteTask(req, task_id);
     });
-
 
     // Получение списка всех задач пользователя
     CROW_ROUTE(app, "/tasks").methods("GET"_method)([](const crow::request& req)
@@ -51,7 +51,7 @@ int main()
     });
 
     // Добавление тегов к задаче
-    CROW_ROUTE(app, "/task/<int>/tags").methods("POST"_method)([](const crow::request& req, int task_id)
+    CROW_ROUTE(app, "/tasks/<int>/tags").methods("POST"_method)([](const crow::request& req, int task_id)
     {
         return tag::addTags(req, task_id);
     });
