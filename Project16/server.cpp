@@ -2,10 +2,13 @@
 #include "task.h"
 #include "tag.h"
 #include "database.h"
+#include "cache.h"
+
 int main() 
 {
     ConnectionPool::getInstance(); // Создание пула соединений к БД
-
+    RedisConnectionPool::getInstance();
+    
     crow::SimpleApp app; 
 
     // Регистрация

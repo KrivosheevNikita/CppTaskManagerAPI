@@ -18,6 +18,22 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="auth.cpp" />
+    <ClCompile Include="cache.cpp" />
+    <ClCompile Include="database.cpp" />
+    <ClCompile Include="server.cpp" />
+    <ClCompile Include="tag.cpp" />
+    <ClCompile Include="task.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="auth.h" />
+    <ClInclude Include="cache.h" />
+    <ClInclude Include="crow_all.h" />
+    <ClInclude Include="database.h" />
+    <ClInclude Include="tag.h" />
+    <ClInclude Include="task.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -118,7 +134,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\vcpkg\installed\x64-windows\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libpq.lib;pqxx.lib;argon2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libpq.lib;pqxx.lib;hiredis.lib;argon2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -137,20 +153,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="auth.cpp" />
-    <ClCompile Include="auth.h" />
-    <ClCompile Include="database.cpp" />
-    <ClCompile Include="server.cpp" />
-    <ClCompile Include="tag.cpp" />
-    <ClCompile Include="task.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="crow_all.h" />
-    <ClInclude Include="database.h" />
-    <ClInclude Include="tag.h" />
-    <ClInclude Include="task.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

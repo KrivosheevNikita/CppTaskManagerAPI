@@ -2,25 +2,28 @@
 
 namespace tag 
 {
-    void addTagsToTask(pqxx::work& txn, int task_id, const crow::json::rvalue& jsonData)
+    std::vector<std::string> addTagsToTask(pqxx::work& txn, int task_id, const crow::json::rvalue& jsonData) 
     {
-        if (jsonData.has("tags"))
-        {
-            for (const auto& tag : jsonData["tags"])
-            {
+        std::vector<std::string> tags;
+
+        if (jsonData.has("tags")) {
+            for (const auto& tag : jsonData["tags"]) {
                 std::string tag_name = tag.s();
+                tags.push_back(tag_name); // Добавляем тег в список для возвращения
+
                 // Проверяем, существует ли тег, если нет, то добавляем его
                 auto tagCheck = txn.exec_params("SELECT tag_id FROM tags WHERE tag_name = $1", tag_name);
-
                 int tag_id;
-                if (tagCheck.empty()) {
-                    // Если тег не существует, то создаем новый
+
+                if (tagCheck.empty()) 
+                {
+                    // Если тег не существует, создаем новый
                     auto insertTag = txn.exec_params(
                         "INSERT INTO tags (tag_name) VALUES ($1) RETURNING tag_id", tag_name
                     );
                     tag_id = insertTag[0][0].as<int>();
                 }
-                else
+                else 
                 {
                     tag_id = tagCheck[0][0].as<int>();
                 }
@@ -29,7 +32,10 @@ namespace tag
                 txn.exec_params("INSERT INTO task_tags (task_id, tag_id) VALUES ($1, $2) ON CONFLICT DO NOTHING", task_id, tag_id);
             }
         }
+
+        return tags; // Возвращаем список тегов для использования в кэше
     }
+
 
     void addTagsToResponse(std::string& tags, crow::json::wvalue& response)
     {
@@ -86,6 +92,10 @@ namespace tag
             tag::addTagsToTask(txn, task_id, jsonData);
 
             txn.commit();
+
+            // Удаляем из кэша, так как данные в кэше стали неактуальными
+            deleteTaskFromCache(task_id, user_id);
+
             return crow::response(200, "Tags were added successfully");
         }
         catch (const std::exception& e)

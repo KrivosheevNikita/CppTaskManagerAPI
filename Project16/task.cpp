@@ -2,16 +2,14 @@
 
 namespace task
 {
-    
     crow::response createTask(const crow::request& req)
     {
         try
         {
             int user_id;
             // Проверяем токен и получаем user_id
-            if (!auth::checkToken(req, user_id)) {
+            if (!auth::checkToken(req, user_id)) 
                 return crow::response(401, "Missing or invalid authorization token");
-            }
 
             auto db = connectDB();
             if (!db.is_open())
@@ -30,21 +28,29 @@ namespace task
             pqxx::work txn(db);
 
             auto taskInsert = txn.exec_params(
-                R"(INSERT INTO tasks (user_id, task_name, description, status_id, priority, due_date) 
-                    VALUES ($1, $2, $3, $4, $5, $6) RETURNING task_id)",
+                R"(WITH ins AS (
+                INSERT INTO tasks (user_id, task_name, description, status_id, priority, due_date) 
+                VALUES ($1, $2, $3, $4, $5, $6) RETURNING task_id, status_id)
+                SELECT ins.task_id, s.status_name 
+                FROM ins 
+                JOIN task_statuses s ON ins.status_id = s.status_id)",
                 user_id, task_name, description, status_id, priority, due_date
             );
 
             int task_id = taskInsert[0][0].as<int>();
 
             // Проверяем наличие тегов и добавляем их, если они есть
-            tag::addTagsToTask(txn, task_id, jsonData);
+            std::vector<std::string> tags = tag::addTagsToTask(txn, task_id, jsonData);
+            std::string status_name = taskInsert[0]["status_name"].as<std::string>();
 
             txn.commit();
 
+            // Сохраняем в кэш
+            saveTaskInCache(task_id, user_id, task_name, description, status_name, priority, due_date, tags);
+
             crow::json::wvalue response;
             response["message"] = "Task was created successfully";
-            response["task_id"] = task_id;
+            response["task_id"] = task_id; // Возвращаем id созданной задачи
             return crow::response(200, response);
         }
         catch (const std::exception& e)
@@ -78,19 +84,33 @@ namespace task
             pqxx::work txn(db);
 
             auto result = txn.exec_params("SELECT task_id FROM tasks WHERE task_id = $1 AND user_id = $2", task_id, user_id);
+
             if (result.empty())
                 return crow::response(403, "Access denied");
 
             // Обновление всех полей задачи
-            txn.exec_params("UPDATE tasks SET task_name = $1, description = $2, status_id = $3, priority = $4, due_date = $5 WHERE task_id = $6",
-                task_name, description, status_id, priority, due_date, task_id);
+            auto updateResult = txn.exec_params(
+                R"(UPDATE tasks 
+                SET task_name = $1, description = $2, status_id = $3, priority = $4, due_date = $5 
+                WHERE task_id = $6 
+                RETURNING (SELECT status_name FROM task_statuses WHERE status_id = $3) AS status_name)",
+                task_name, description, status_id, priority, due_date, task_id
+            );
 
+            // Удаляем старые теги
             txn.exec_params("DELETE FROM task_tags WHERE task_id = $1", task_id);
 
-            // Обновление тегов
+            // Добавляем новые теги 
             tag::addTagsToTask(txn, task_id, jsonData);
 
             txn.commit();
+
+            std::vector<std::string> tags = tag::addTagsToTask(txn, task_id, jsonData);
+            std::string status_name = updateResult[0]["status_name"].as<std::string>();
+
+            // Сохраняем обновленную задачу в кэш
+            saveTaskInCache(task_id, user_id, task_name, description, status_name, priority, due_date, tags); 
+
             return crow::response(200, "Task updated successfully");
         }
         catch (const std::exception& e)
@@ -105,15 +125,21 @@ namespace task
         {
             int user_id;
             if (!auth::checkToken(req, user_id))
-            {
                 return crow::response(401, "Missing or invalid authorization token");
-            }
+
+            auto responseCache = getTaskFromCache(task_id, user_id);
+
+            if (!responseCache.count("null")) // Проверяем, нашелся ли ответ в кэше, используя метку "null"
+                return responseCache;
+
+            // Если задачи нет в кэше, идем в бд
             auto db = connectDB();
             if (!db.is_open())
+            {
                 return crow::response(500, "Internal server error");
+            }
 
             pqxx::nontransaction txn(db);
-
             auto result = txn.exec_params(
                 R"(SELECT t.task_id, t.task_name, t.description, t.priority, t.due_date,
                 s.status_name, COALESCE(array_agg(tag.tag_name), '{}') AS tags
@@ -142,6 +168,9 @@ namespace task
             auto tags = result[0]["tags"].as<std::string>();
             tag::addTagsToResponse(tags, response);
 
+            // Сохраняем задачу в кэш
+            saveTaskInCache(task_id, user_id, response);
+
             return crow::response(response);
         }
         catch (const std::exception& e)
@@ -155,9 +184,8 @@ namespace task
         try
         {
             int user_id;
-            if (!auth::checkToken(req, user_id)) {
+            if (!auth::checkToken(req, user_id))
                 return crow::response(401, "Missing or invalid authorization token");
-            }
 
             auto db = connectDB();
             if (!db.is_open())
@@ -177,6 +205,9 @@ namespace task
             txn.exec_params("DELETE FROM tasks WHERE task_id = $1", task_id);
 
             txn.commit();
+
+            // Так же удаляем из кэша
+            deleteTaskFromCache(task_id, user_id);
 
             return crow::response(200, "Task deleted successfully");
         }

@@ -55,6 +55,7 @@ void ConnectionPool::returnConnection(std::shared_ptr<pqxx::connection> conn)
     poolWaiting.notify_one();
 }
 
+
 // Количество доступных соединений
 unsigned int ConnectionPool::availableConnections() const 
 {

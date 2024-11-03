@@ -6,6 +6,7 @@
 #include <string>
 #include "auth.h"
 #include "tag.h"
+#include "cache.h"
 
 namespace task
 {
