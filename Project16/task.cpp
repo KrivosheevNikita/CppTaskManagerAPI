@@ -217,6 +217,46 @@ namespace task
         }
     }
 
+    std::string buildQueryWithFilterTags(int user_id, const std::string& tagsFilter)
+    {
+        std::string query = R"(
+            SELECT t.task_id, t.task_name, t.description, t.priority, t.due_date, 
+            s.status_name, COALESCE(array_agg(tag.tag_name), '{}') AS tags
+            FROM tasks t
+            LEFT JOIN task_tags tt ON t.task_id = tt.task_id
+            LEFT JOIN tags tag ON tt.tag_id = tag.tag_id
+            LEFT JOIN task_statuses s ON t.status_id = s.status_id
+            WHERE t.user_id = )" + std::to_string(user_id);
+
+        // Если в параметрах есть теги, то добавляем условие для фильтрации
+        if (!tagsFilter.empty())
+        {
+            std::vector<std::string> tags;
+            std::stringstream tag_stream(tagsFilter);
+            std::string tag;
+
+            while (std::getline(tag_stream, tag, ','))
+            {
+                tags.push_back(tag);
+            }
+
+            query += R"(
+                AND t.task_id IN (
+                SELECT tt.task_id
+                FROM task_tags tt
+                JOIN tags tag ON tt.tag_id = tag.tag_id
+                WHERE tag.tag_name = ANY('{)" + tagsFilter + R"(}')
+                GROUP BY tt.task_id
+                HAVING COUNT(DISTINCT tag.tag_name) = )" + std::to_string(tags.size()) + ")";
+        }
+
+        query += R"(
+        GROUP BY t.task_id, s.status_id, s.status_name
+        ORDER BY t.priority DESC, t.due_date ASC, t.task_id ASC)";
+
+        return query;
+    }
+
     crow::response getAllTasks(const crow::request& req)
     {
         try
@@ -229,20 +269,13 @@ namespace task
             if (!db.is_open())
                 return crow::response(500, "Internal Server Error");
 
-            pqxx::work txn(db);
+            crow::query_string qs(req.url_params);
+            std::string tagsFilter = qs.get("tags") ? qs.get("tags") : "";
 
-            auto result = txn.exec_params(
-                R"(SELECT t.task_id, t.task_name, t.description, t.priority, t.due_date, 
-                s.status_name, COALESCE(array_agg(tag.tag_name), '{}') AS tags
-                FROM tasks t
-                LEFT JOIN task_tags tt ON t.task_id = tt.task_id
-                LEFT JOIN tags tag ON tt.tag_id = tag.tag_id
-                LEFT JOIN task_statuses s ON t.status_id = s.status_id
-                WHERE t.user_id = $1
-                GROUP BY t.task_id, s.status_id, s.status_name
-                ORDER BY s.status_id ASC, t.priority ASC, t.due_date ASC, t.task_id ASC)",
-                user_id
-            );
+            std::string query = buildQueryWithFilterTags(user_id, tagsFilter);
+
+            pqxx::nontransaction txn(db);
+            pqxx::result result = txn.exec(query);
 
             crow::json::wvalue response;
             response["tasks"] = crow::json::wvalue::list();
