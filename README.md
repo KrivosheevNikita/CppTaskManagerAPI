@@ -165,12 +165,12 @@ Recieves a list of all tasks for the authenticated user
 
 **Request:**
 ```
-GET /tasks
+GET /tasks?tags=tag2
 Headers: { "Authorization": "Bearer your_authorization_token" }
 ```
 
 **Response:**
-- **200**: Returns an array of all tasks
+- **200**: Returns an array of all tasks with optional filtering by tags
   ```
   {
       "tasks": [
@@ -182,15 +182,6 @@ Headers: { "Authorization": "Bearer your_authorization_token" }
             "status_id": 2, 
             "due_date": "2025-01-01", 
             "tags": ["tag1", "tag2"] 
-          },
-          {
-            "task_id": 2,
-            "task_name": "New Task2", 
-            "description": "New Task2",
-            "priority": 1, 
-            "status_id": 3, 
-            "due_date": "2025-01-01", 
-            "tags": ["tag3"] 
           }
       ]
   }
