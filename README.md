@@ -29,7 +29,7 @@ The following endpoints are available in the Task Manager API:
 - `GET /tasks/{task_id}` — Receive a  task by ID
 - `PUT /tasks/{task_id}` — Update an existing task
 - `DELETE /tasks/{task_id}` — Delete a task
-- `GET /tasks` — Recieve all tasks for the authenticated user
+- `GET /tasks?tags={tag}` — Recieve all tasks for the authenticated user with optional filtering by tags
 - `POST /tasks/{task_id}/tags` — Add tags to a task
 
 ### Comment Management
@@ -171,7 +171,7 @@ Recieves a list of all tasks for the authenticated user
 
 **Request:**
 ```
-GET /tasks?tags=tag2
+GET /tasks?tags=tag1,tag2
 Headers: { "Authorization": "Bearer your_authorization_token" }
 ```
 
