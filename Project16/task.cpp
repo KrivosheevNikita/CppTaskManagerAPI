@@ -51,7 +51,7 @@ namespace task
             crow::json::wvalue response;
             response["message"] = "Task was created successfully";
             response["task_id"] = task_id; // Возвращаем id созданной задачи
-            return crow::response(200, response);
+            return crow::response(201, response);
         }
         catch (const std::exception& e)
         {

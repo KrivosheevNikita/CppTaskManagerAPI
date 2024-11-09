@@ -66,7 +66,7 @@ def test_create_task():
         "due_date": "2023-12-31"
     }
     response = requests.post(f"{BASE_URL}/tasks", json=payload, headers=headers)
-    assert response.status_code == 200
+    assert response.status_code == 201
 
     json_data = response.json()
     assert "task_id" in json_data

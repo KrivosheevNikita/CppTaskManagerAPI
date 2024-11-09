@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="auth.cpp" />
     <ClCompile Include="cache.cpp" />
+    <ClCompile Include="comment.cpp" />
     <ClCompile Include="database.cpp" />
     <ClCompile Include="server.cpp" />
     <ClCompile Include="tag.cpp" />
@@ -29,6 +30,7 @@
   <ItemGroup>
     <ClInclude Include="auth.h" />
     <ClInclude Include="cache.h" />
+    <ClInclude Include="comment.h" />
     <ClInclude Include="crow_all.h" />
     <ClInclude Include="database.h" />
     <ClInclude Include="tag.h" />

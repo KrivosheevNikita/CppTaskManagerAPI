@@ -142,7 +142,7 @@ namespace comment
             );
 
             if (result.affected_rows() == 0)
-                return crow::response(403, "Access denied");
+                return crow::response(404, "Comment not found");
 
             return crow::response(200, "Comment deleted successfully");
         }
