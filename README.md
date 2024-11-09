@@ -1,11 +1,12 @@
 # Task Manager API
-Task Manager API is a C++ RESTful API for task management built using C++ and Crow framework. It uses PostgreSQL as a database and Redis as a cache. Authorization using a JWT token is used. Passwords in the database are stored in hashed form. Task Manager API allows users to create, update, view, and delete tasks, add tags for organization and filtering.
+Task Manager API is a C++ RESTful API for task management built using C++ and Crow framework. It uses PostgreSQL as a database and Redis as a cache. Authorization using a JWT token is used. Passwords in the database are stored in hashed form. Task Manager API allows users to create, update, view, and delete tasks, add tags for organization and filtering, manage comments for tasks.
 ## Features
 
 - User registration and login with token-based authentication (JWT)
 - Create, update, delete, and view tasks
 - Add tags to tasks
 - Get all tasks associated with a specific user
+- Add, update, delete and view comments for tasks
 ## Technology Stack
 
 - C++
@@ -31,6 +32,11 @@ The following endpoints are available in the Task Manager API:
 - `GET /tasks` — Recieve all tasks for the authenticated user
 - `POST /tasks/{task_id}/tags` — Add tags to a task
 
+### Comment Management
+- `POST /tasks/{task_id}/comments` — Add a comment to a task
+- `GET /tasks/{task_id}/comments` — Recieve all comments for a task
+- `PUT /tasks/{task_id}/comments/{comment_id}` — Update a comment on a task
+- `DELETE /tasks/{task_id}/comments/{comment_id}` — Delete a comment from a tas
 
 ## Usage
 
@@ -97,7 +103,7 @@ Headers: { "Authorization": "Bearer your_authorization_token" }
 ```
 
 **Response:**
-- **200**: Task created successfully
+- **201**: Task created successfully
   ```
   {
       "message": "Task was created successfully",
@@ -222,6 +228,95 @@ Headers: { "Authorization": "Bearer your_authorization_token" }
 - **400**: Invalid or missing JSON data
 - **401**: Missing or invalid authorization token
 - **403**: Access denied
+---
+#### `POST tasks/{task_id}/comments`
+Add new comment to the task
 
+**Request:**
+```
+POST /tasks/1/comments
+Headers: { "Authorization": "Bearer your_authorization_token" }
+{
+    "comment": "Some comment"
+}
+```
 
+**Response:**
+- **201**: Comment added successfully
+  ```
+  {
+    "message": "Comment added successfully", 
+    "comment_id": 1 
+  }
+  ```
+- **400**: Invalid or missing JSON data
+- **401**: Missing or invalid authorization token
+---
+
+#### `GET /tasks/{task_id}/comments`
+Recieves all comments on the task
+
+**Request:**
+```
+GET /tasks/1/comments
+Headers: { "Authorization": "Bearer your_authorization_token" }
+```
+
+**Response:**
+- **200**: Returns an array of all comments on the task
+  ```
+  {
+      "comments": [
+        {
+            "comment_id": 1,
+            "comment": "Some comment",
+            "created_at": "2024-11-09 21:22:09.329478",
+            "updated_at": "2024-11-09 21:54:12.692405"
+        },
+        {
+            "comment_id": 2,
+            "comment": "Some comment 2",
+            "created_at": "2024-11-09 21:24:35.394871",
+            "updated_at": "2024-11-09 21:24:35.394871"
+        }
+      ]
+  }
+  ```
+- **401**: Missing or invalid authorization token
+- **404**: Task not found
+
+---
+
+#### `PUT /tasks/{task_id}/comments/{comment_id}`
+Updates a comment on the task
+
+**Request:**
+```
+PUT /tasks/1/comments/1
+Headers: { "Authorization": "Bearer your_authorization_token" }
+{
+  "comment": "New comment"
+}
+```
+
+**Response:**
+- **200**: Comment updated successfully
+- **400**: Invalid or missing JSON data
+- **401**: Missing or invalid authorization token
+- **403**: Access denied
+---
+#### `DELETE /tasks/{task_id}/comments/{comment_id}`
+Deletes a comment on the task
+
+**Request:**
+```
+DELETE /tasks/1/comments/1
+Headers: { "Authorization": "Bearer your_authorization_token" }
+```
+
+**Response:**
+- **200**: Comment deleted successfully
+- **401**: Missing or invalid authorization token
+- **404**: Comment not found
+---
 
