@@ -35,7 +35,10 @@ namespace auth
 
             return true;
         }
-        catch (const std::exception& e) {}
+        catch (const std::exception& e) 
+        {
+            return false;
+        }
     }
 
     // Генерация соли для хеширования

@@ -1,4 +1,4 @@
-#include "cache.h"
+п»ї#include "cache.h"
 
 RedisConnectionPool::RedisConnectionPool(const std::string& host, int port, unsigned int minSize, unsigned int maxSize)
     : host(host), port(port), minSize(minSize), maxSize(maxSize), curSize(0)
@@ -10,14 +10,14 @@ RedisConnectionPool::RedisConnectionPool(const std::string& host, int port, unsi
     }
 }
 
-// Получение единственного экземпляра пула соединений
+// РџРѕР»СѓС‡РµРЅРёРµ РµРґРёРЅСЃС‚РІРµРЅРЅРѕРіРѕ СЌРєР·РµРјРїР»СЏСЂР° РїСѓР»Р° СЃРѕРµРґРёРЅРµРЅРёР№
 RedisConnectionPool& RedisConnectionPool::getInstance()
 {
     static RedisConnectionPool pool(HOST, PORT, MIN_SIZE_R, MAX_SIZE_R);
     return pool;
 }
 
-// Взять соединение из пула
+// Р’Р·СЏС‚СЊ СЃРѕРµРґРёРЅРµРЅРёРµ РёР· РїСѓР»Р°
 redisContext* RedisConnectionPool::getConnection()
 {
     std::unique_lock<std::mutex> lock(mtx);
@@ -41,7 +41,7 @@ redisContext* RedisConnectionPool::getConnection()
     return conn;
 }
 
-// Вернуть соединение в пул 
+// Р’РµСЂРЅСѓС‚СЊ СЃРѕРµРґРёРЅРµРЅРёРµ РІ РїСѓР» 
 void RedisConnectionPool::returnConnection(redisContext* conn)
 {
     std::unique_lock<std::mutex> lock(mtx);
@@ -51,20 +51,20 @@ void RedisConnectionPool::returnConnection(redisContext* conn)
     poolWaiting.notify_one();
 }
 
-// Создание нового соединения
+// РЎРѕР·РґР°РЅРёРµ РЅРѕРІРѕРіРѕ СЃРѕРµРґРёРЅРµРЅРёСЏ
 redisContext* RedisConnectionPool::createConnection()
 {
-    timeval timeout = { 0, 0 }; // Если соединение не устанавливается, то не ждем 
+    timeval timeout = { 0, 0 }; // Р•СЃР»Рё СЃРѕРµРґРёРЅРµРЅРёРµ РЅРµ СѓСЃС‚Р°РЅР°РІР»РёРІР°РµС‚СЃСЏ, С‚Рѕ РЅРµ Р¶РґРµРј 
     return redisConnectWithTimeout(host.c_str(), port, timeout);
 }
 
-// Количество доступных соединений
+// РљРѕР»РёС‡РµСЃС‚РІРѕ РґРѕСЃС‚СѓРїРЅС‹С… СЃРѕРµРґРёРЅРµРЅРёР№
 unsigned int RedisConnectionPool::availableConnections() const
 {
     return connections.size();
 }
 
-// Количество активных соединений
+// РљРѕР»РёС‡РµСЃС‚РІРѕ Р°РєС‚РёРІРЅС‹С… СЃРѕРµРґРёРЅРµРЅРёР№
 unsigned int RedisConnectionPool::activeConnections() const
 {
     return curSize - connections.size();
@@ -78,18 +78,18 @@ RedisConnectionGuard::~RedisConnectionGuard()
     RedisConnectionPool::getInstance().returnConnection(conn);
 }
 
-// Подключению к redis
+// РџРѕРґРєР»СЋС‡РµРЅРёСЋ Рє redis
 RedisConnectionGuard connectRedis()
 {
     return RedisConnectionGuard();
 }
 
-// Формирование ключа
+// Р¤РѕСЂРјРёСЂРѕРІР°РЅРёРµ РєР»СЋС‡Р°
 inline std::string createCacheKey(int task_id, int user_id) {
     return "task:" + std::to_string(task_id) + ":user:" + std::to_string(user_id);
 }
 
-// Получение задачи из кэша
+// РџРѕР»СѓС‡РµРЅРёРµ Р·Р°РґР°С‡Рё РёР· РєСЌС€Р°
 crow::json::wvalue getTaskFromCache(int task_id, int user_id)
 {
     crow::json::wvalue response;
@@ -101,18 +101,18 @@ crow::json::wvalue getTaskFromCache(int task_id, int user_id)
         if (reply && reply->type == REDIS_REPLY_STRING)
         {
             response = crow::json::load(reply->str);
-            redisCommand(redis, "EXPIRE %s 300", cacheKey.c_str()); // Продлеваем время жизни ключа до 5 минут
+            redisCommand(redis, "EXPIRE %s 300", cacheKey.c_str()); // РџСЂРѕРґР»РµРІР°РµРј РІСЂРµРјСЏ Р¶РёР·РЅРё РєР»СЋС‡Р° РґРѕ 5 РјРёРЅСѓС‚
             freeReplyObject(reply);
         }
         else
         {
-            response["null"] = "null"; // Специальная метка, обозначающая, что ответ в кэше не найден
+            response["null"] = "null"; // РЎРїРµС†РёР°Р»СЊРЅР°СЏ РјРµС‚РєР°, РѕР±РѕР·РЅР°С‡Р°СЋС‰Р°СЏ, С‡С‚Рѕ РѕС‚РІРµС‚ РІ РєСЌС€Рµ РЅРµ РЅР°Р№РґРµРЅ
         }
     }
     return response;
 }
 
-// Сохранение задачи в кэше
+// РЎРѕС…СЂР°РЅРµРЅРёРµ Р·Р°РґР°С‡Рё РІ РєСЌС€Рµ
 void saveTaskInCache(int task_id, int user_id, const crow::json::wvalue& response)
 {
     auto redis = connectRedis();
@@ -120,7 +120,7 @@ void saveTaskInCache(int task_id, int user_id, const crow::json::wvalue& respons
     {
         std::string cacheKey = createCacheKey(task_id, user_id);
         std::string jsonData = response.dump();
-        redisCommand(redis, "SETEX %s 300 %s", cacheKey.c_str(), jsonData.c_str()); // Устанавливаем время жизни ключа 5 минут
+        redisCommand(redis, "SETEX %s 300 %s", cacheKey.c_str(), jsonData.c_str()); // РЈСЃС‚Р°РЅР°РІР»РёРІР°РµРј РІСЂРµРјСЏ Р¶РёР·РЅРё РєР»СЋС‡Р° 5 РјРёРЅСѓС‚
     }
 }
 

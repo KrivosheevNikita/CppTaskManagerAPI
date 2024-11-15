@@ -19,22 +19,22 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="auth.cpp" />
-    <ClCompile Include="cache.cpp" />
-    <ClCompile Include="comment.cpp" />
-    <ClCompile Include="database.cpp" />
-    <ClCompile Include="server.cpp" />
-    <ClCompile Include="tag.cpp" />
-    <ClCompile Include="task.cpp" />
+    <ClCompile Include="..\src\auth.cpp" />
+    <ClCompile Include="..\src\cache.cpp" />
+    <ClCompile Include="..\src\comment.cpp" />
+    <ClCompile Include="..\src\database.cpp" />
+    <ClCompile Include="..\src\server.cpp" />
+    <ClCompile Include="..\src\tag.cpp" />
+    <ClCompile Include="..\src\task.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="auth.h" />
-    <ClInclude Include="cache.h" />
-    <ClInclude Include="comment.h" />
-    <ClInclude Include="crow_all.h" />
-    <ClInclude Include="database.h" />
-    <ClInclude Include="tag.h" />
-    <ClInclude Include="task.h" />
+    <ClInclude Include="..\src\auth.h" />
+    <ClInclude Include="..\src\cache.h" />
+    <ClInclude Include="..\src\comment.h" />
+    <ClInclude Include="..\src\crow_all.h" />
+    <ClInclude Include="..\src\database.h" />
+    <ClInclude Include="..\src\tag.h" />
+    <ClInclude Include="..\src\task.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -129,7 +129,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\vcpkg\installed\x64-windows\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src;C:\vcpkg\installed\x64-windows\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>

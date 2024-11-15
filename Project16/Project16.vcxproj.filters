@@ -15,48 +15,48 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="auth.cpp">
+    <ClCompile Include="..\src\auth.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="database.cpp">
+    <ClCompile Include="..\src\cache.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="server.cpp">
+    <ClCompile Include="..\src\comment.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="tag.cpp">
+    <ClCompile Include="..\src\database.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="task.cpp">
+    <ClCompile Include="..\src\server.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="cache.cpp">
+    <ClCompile Include="..\src\tag.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="comment.cpp">
+    <ClCompile Include="..\src\task.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="auth.h">
+    <ClInclude Include="..\src\auth.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="crow_all.h">
+    <ClInclude Include="..\src\cache.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="database.h">
+    <ClInclude Include="..\src\comment.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="tag.h">
+    <ClInclude Include="..\src\crow_all.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="task.h">
+    <ClInclude Include="..\src\database.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="cache.h">
+    <ClInclude Include="..\src\tag.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="comment.h">
+    <ClInclude Include="..\src\task.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

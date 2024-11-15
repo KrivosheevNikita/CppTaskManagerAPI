@@ -1,4 +1,4 @@
-#ifndef CACHE_H
+п»ї#ifndef CACHE_H
 #define CACHE_H
 
 #include <hiredis/hiredis.h>
@@ -6,8 +6,9 @@
 #include <mutex>
 #include <vector>
 #include <string>
+#include <condition_variable>
 
-const std::string HOST = "127.0.0.1";
+const std::string HOST = "redis";
 const int PORT = 6379;
 const int MIN_SIZE_R = 3;
 const int MAX_SIZE_R = 10;
@@ -35,7 +36,7 @@ private:
     redisContext* createConnection();
 };
 
-// Класс для автоматического возврата соединения в пул после выхода из зоны видимости
+// РљР»Р°СЃСЃ РґР»СЏ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРѕРіРѕ РІРѕР·РІСЂР°С‚Р° СЃРѕРµРґРёРЅРµРЅРёСЏ РІ РїСѓР» РїРѕСЃР»Рµ РІС‹С…РѕРґР° РёР· Р·РѕРЅС‹ РІРёРґРёРјРѕСЃС‚Рё
 class RedisConnectionGuard
 {
 public:

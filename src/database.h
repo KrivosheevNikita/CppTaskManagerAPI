@@ -3,8 +3,9 @@
 
 #include <pqxx/pqxx>
 #include <mutex>
+#include <condition_variable>
 
-const std::string CONNECTION_STRING = "dbname=taskManager user=postgres password=1234 host=localhost port=5432";
+const std::string CONNECTION_STRING = "dbname=taskManager user=postgres password=1234 host=db port=5432";
 const int MIN_SIZE_POOL = 3;
 const int MAX_SIZE_POOL = 10;
 
