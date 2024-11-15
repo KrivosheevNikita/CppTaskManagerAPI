@@ -1,5 +1,18 @@
 # Task Manager API
 Task Manager API is a C++ RESTful API for task management built using C++ and Crow framework. It uses PostgreSQL as a database and Redis as a cache. Authorization using a JWT token is used. Passwords in the database are stored in hashed form. Task Manager API allows users to create, update, view, and delete tasks, add tags for organization and filtering, manage comments for tasks.
+
+## Run the Project with Docker
+
+```
+git clone https://github.com/KrivosheevNikita/CppTaskManagerAPI.git
+cd CppTaskManagerAPI
+docker-compose up --build
+```
+Once the containers are running, the server should be accessible at:
+```
+http://localhost:8080
+```
+
 ## Features
 
 - User registration and login with token-based authentication (JWT)
